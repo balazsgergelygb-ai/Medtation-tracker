@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Meditation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+
+:root{
+  --accent:#3B82F6;
+  --accent2:#FF8A65;
+  --bg-top:#87CEEB;
+  --bg-bot:#FFD194;
+  --text:#1a202c;
+  --text2:rgba(26,32,44,0.6);
+  --glass:rgba(255,255,255,0.45);
+  --glass-border:rgba(255,255,255,0.5);
+  --bar:linear-gradient(180deg,#3B82F6,#2563EB);
+  --btn:#3B82F6;
+}
+
+body.dark{
+  --accent:#9F7AEA;
+  --accent2:#9F7AEA;
+  --bg-top:#0B132B;
+  --bg-bot:#1C2541;
+  --text:#f0f0ff;
+  --text2:rgba(240,240,255,0.55);
+  --glass:rgba(255,255,255,0.05);
+  --glass-border:rgba(255,255,255,0.1);
+  --bar:linear-gradient(180deg,#9F7AEA,#7C3AED);
+  --btn:#7C3AED;
+}
+
+html,body{
+  width:100%;height:100%;
+  overflow:hidden;
+  font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  -webkit-user-select:none;user-select:none;
+  color:var(--text);
+  transition:color .4s;
+}
+
+/* ─── BACKGROUND ─── */
+.bg{
+  position:fixed;inset:0;z-index:0;
+  background:linear-gradient(180deg,var(--bg-top) 0%,var(--bg-bot) 100%);
+  transition:background .6s;
+}
+
+/* SVG landscape */
+.landscape{
+  position:fixed;bottom:0;left:0;right:0;z-index:1;
+  pointer-events:none;
+}
+
+/* CSS clouds */
+.clouds-layer{
+  position:fixed;top:0;left:0;right:0;bottom:0;
+  pointer-events:none;z-index:2;
+  overflow:hidden;
+}
+
+.cld{
+  position:absolute;
+  border-radius:999px;
+  background:white;
+  opacity:0.22;
+  animation:drift linear infinite;
+}
+body.dark .cld{opacity:0.07;background:#c7d2fe}
+
+.cld::before,.cld::after{
+  content:"";position:absolute;
+  border-radius:999px;
+  background:inherit;
+}
+
+.cld.a{width:100px;height:30px;top:12%;left:-120px;animation-duration:75s}
+.cld.a::before{width:40px;height:40px;left:14px;top:-14px}
+.cld.a::after{width:50px;height:50px;right:12px;top:-22px}
+
+.cld.b{width:70px;height:22px;top:24%;left:-100px;animation-duration:95s;animation-delay:-30s;opacity:0.15}
+.cld.b::before{width:28px;height:28px;left:10px;top:-10px}
+.cld.b::after{width:36px;height:36px;right:8px;top:-16px}
+
+.cld.c{width:120px;height:36px;top:8%;left:-150px;animation-duration:110s;animation-delay:-55s;opacity:0.12}
+.cld.c::before{width:48px;height:48px;left:18px;top:-18px}
+.cld.c::after{width:60px;height:60px;right:14px;top:-26px}
+
+.cld.d{width:80px;height:25px;top:38%;left:-110px;animation-duration:85s;animation-delay:-70s;opacity:0.1}
+.cld.d::before{width:32px;height:32px;left:12px;top:-12px}
+.cld.d::after{width:40px;height:40px;right:10px;top:-18px}
+
+@keyframes drift{
+  from{transform:translateX(0)}
+  to{transform:translateX(calc(100vw + 200px))}
+}
+
+/* ─── SCREENS ─── */
+.screen{
+  position:fixed;inset:0;z-index:10;
+  display:flex;flex-direction:column;
+  max-width:430px;margin:0 auto;
+  padding:calc(env(safe-area-inset-top)+14px) 18px calc(env(safe-area-inset-bottom)+16px);
+  transition:opacity .35s ease,transform .35s ease;
+  pointer-events:auto;
+}
+
+.screen.hidden{
+  opacity:0;transform:translateY(24px);
+  pointer-events:none;
+}
+
+/* ─── MAIN SCREEN ─── */
+#mainScreen{gap:0}
+
+.top{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:28px;
+}
+
+.iconbtn{
+  width:44px;height:44px;border-radius:50%;
+  border:1.5px solid var(--glass-border);
+  background:var(--glass);
+  backdrop-filter:blur(12px);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:var(--text);
+  transition:transform .2s,background .3s;
+}
+.iconbtn:active{transform:scale(0.93)}
+
+.app-title{
+  font-family:'Inter',sans-serif;
+  font-weight:600;font-size:15px;
+  letter-spacing:0.5px;
+  opacity:0.8;
+}
+
+/* streak floating */
+.streak-area{
+  margin-bottom:6px;
+  padding:0 4px;
+}
+.streak-big{
+  font-family:'Cormorant Garamond',serif;
+  font-size:48px;font-weight:300;
+  letter-spacing:-1px;
+  line-height:1.1;
+  color:var(--text);
+}
+.streak-sub{
+  font-size:13px;font-weight:500;
+  color:var(--text2);
+  margin-top:2px;
+  letter-spacing:0.2px;
+}
+
+/* week nav */
+.week-nav{
+  display:flex;align-items:center;gap:10px;
+  margin-bottom:16px;padding:0 4px;
+}
+.nav-btn{
+  width:34px;height:34px;
+  border-radius:9px;
+  border:1.5px solid var(--glass-border);
+  background:var(--glass);
+  backdrop-filter:blur(10px);
+  color:var(--accent);
+  font-size:15px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:transform .2s,opacity .2s;
+}
+.nav-btn:active{transform:scale(0.9)}
+.nav-btn:disabled{opacity:0.2;cursor:default}
+
+.week-info{flex:1;text-align:center}
+.week-label{
+  font-size:11px;font-weight:600;
+  text-transform:uppercase;letter-spacing:0.7px;
+  color:var(--text2);margin-bottom:3px;
+}
+.week-total{
+  font-family:'Cormorant Garamond',serif;
+  font-size:30px;font-weight:400;
+  color:var(--accent);letter-spacing:-0.5px;
+}
+
+/* chart – no card, floats on bg */
+.chart-area{
+  flex:1;display:flex;flex-direction:column;
+  padding:0 4px;margin-bottom:14px;
+}
+.chart{
+  flex:1;display:flex;align-items:flex-end;gap:7px;
+  min-height:130px;max-height:180px;
+  margin-bottom:12px;
+}
+.bar-wrap{
+  flex:1;display:flex;flex-direction:column;
+  justify-content:flex-end;align-items:center;
+  height:100%;gap:7px;cursor:pointer;
+  transition:transform .15s;
+}
+.bar-wrap:active{transform:scale(0.95)}
+.bar{
+  width:100%;border-radius:7px 7px 0 0;
+  background:var(--bar);
+  min-height:5px;
+  box-shadow:0 2px 10px rgba(59,130,246,0.25);
+  transition:height .4s ease;
+}
+body.dark .bar{box-shadow:0 2px 10px rgba(159,122,234,0.3)}
+.bar-label{
+  font-size:10px;font-weight:600;
+  color:var(--text2);text-transform:uppercase;letter-spacing:0.4px;
+}
+
+/* days grid */
+.days-grid{
+  display:grid;grid-template-columns:repeat(7,1fr);gap:7px;
+}
+.day-card{
+  background:var(--glass);
+  backdrop-filter:blur(10px);
+  border:1.5px solid var(--glass-border);
+  border-radius:14px;
+  padding:11px 6px;
+  text-align:center;cursor:pointer;
+  display:flex;flex-direction:column;
+  justify-content:center;align-items:center;
+  min-height:66px;
+  transition:transform .15s,background .2s;
+}
+.day-card:active{
+  transform:scale(0.95);
+  background:rgba(59,130,246,0.25);
+}
+body.dark .day-card:active{background:rgba(159,122,234,0.25)}
+.day-name{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.3px;opacity:0.55;margin-bottom:3px}
+.day-mins{font-size:17px;font-weight:700;letter-spacing:-0.3px}
+.day-tag{font-size:9px;opacity:0.38;margin-top:2px;font-weight:500}
+
+/* bottom button */
+.bottom{margin-top:14px}
+.main-btn{
+  width:100%;height:54px;
+  border:none;border-radius:16px;
+  background:var(--btn);
+  color:white;font-family:'Inter',sans-serif;
+  font-weight:700;font-size:15px;
+  cursor:pointer;letter-spacing:0.2px;
+  box-shadow:0 6px 22px rgba(59,130,246,0.3);
+  transition:transform .2s,box-shadow .2s;
+}
+body.dark .main-btn{box-shadow:0 6px 22px rgba(124,58,237,0.35)}
+.main-btn:active{transform:translateY(-2px);box-shadow:0 10px 28px rgba(59,130,246,0.4)}
+
+/* ─── MENU ─── */
+.float-menu{
+  position:fixed;top:70px;right:18px;
+  background:white;
+  border:1px solid rgba(0,0,0,0.07);
+  border-radius:14px;padding:8px 0;
+  min-width:160px;z-index:999;
+  box-shadow:0 6px 20px rgba(0,0,0,0.12);
+  display:none;
+  animation:menuIn .2s ease;
+}
+body.dark .float-menu{background:#1e2a3a;border-color:rgba(255,255,255,0.1);box-shadow:0 6px 20px rgba(0,0,0,0.4)}
+.float-menu.open{display:block}
+@keyframes menuIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+.menu-item{
+  width:100%;padding:12px 18px;
+  background:none;border:none;
+  color:var(--text);font-family:'Inter',sans-serif;
+  font-size:14px;font-weight:500;
+  cursor:pointer;text-align:left;
+  transition:background .15s;
+}
+.menu-item:active{background:rgba(0,0,0,0.05)}
+
+/* ─── TIMER SCREEN ─── */
+#timerScreen{
+  justify-content:center;align-items:center;
+  gap:0;text-align:center;
+}
+.timer-label{
+  font-family:'Cormorant Garamond',serif;
+  font-size:22px;font-weight:300;
+  letter-spacing:2px;
+  color:var(--text2);
+  margin-bottom:28px;
+  text-transform:uppercase;
+}
+.timer-display{
+  font-family:'Cormorant Garamond',serif;
+  font-size:88px;font-weight:300;
+  letter-spacing:-3px;
+  line-height:1;
+  color:var(--text);
+  margin-bottom:48px;
+  transition:color .3s;
+}
+.timer-stop{
+  width:200px;height:52px;
+  border-radius:26px;
+  border:2px solid var(--glass-border);
+  background:var(--glass);
+  backdrop-filter:blur(12px);
+  color:var(--text);
+  font-family:'Inter',sans-serif;
+  font-size:15px;font-weight:600;
+  cursor:pointer;letter-spacing:0.3px;
+  transition:transform .2s,background .2s;
+}
+.timer-stop:active{transform:scale(0.96);background:rgba(239,68,68,0.2)}
+
+/* ─── MODALS ─── */
+.modal{
+  position:fixed;inset:0;z-index:2000;
+  background:rgba(0,0,0,0.38);
+  backdrop-filter:blur(5px);
+  display:none;align-items:flex-end;
+  justify-content:center;padding:0;
+}
+.modal.open{display:flex;animation:fadeIn .25s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+.modal-sheet{
+  background:white;
+  border-radius:24px 24px 0 0;
+  padding:28px 24px calc(env(safe-area-inset-bottom)+28px);
+  width:100%;max-width:430px;
+  animation:sheetUp .3s ease;
+}
+body.dark .modal-sheet{background:#1a2535}
+@keyframes sheetUp{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+.modal-sheet h2{
+  font-family:'Cormorant Garamond',serif;
+  font-size:26px;font-weight:400;
+  letter-spacing:-0.3px;margin-bottom:22px;
+}
+.form-group{margin-bottom:18px}
+.form-group label{
+  display:block;font-size:11px;font-weight:700;
+  text-transform:uppercase;letter-spacing:0.6px;
+  opacity:0.55;margin-bottom:8px;
+}
+.form-group input{
+  width:100%;padding:13px 16px;
+  border-radius:12px;
+  border:1.5px solid rgba(0,0,0,0.1);
+  background:#f8f9fc;
+  color:#1a202c;
+  font-size:17px;font-weight:500;
+  font-family:'Inter',sans-serif;
+  transition:border-color .25s,box-shadow .25s;
+}
+body.dark .form-group input{background:#0f1520;color:#f0f0ff;border-color:rgba(255,255,255,0.1)}
+.form-group input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(59,130,246,0.12)}
+
+.sheet-btns{display:flex;gap:12px;margin-top:24px}
+.sheet-btns button{
+  flex:1;padding:13px;
+  border:none;border-radius:13px;
+  font-family:'Inter',sans-serif;
+  font-size:14px;font-weight:700;
+  cursor:pointer;transition:transform .15s;
+}
+.sheet-btns button:active{transform:scale(0.97)}
+.btn-cancel{background:#f0f4f8;color:#1a202c;border:1.5px solid #e2e8f0}
+body.dark .btn-cancel{background:#2d3a4a;color:#f0f0ff;border-color:#3d4e62}
+.btn-save{background:var(--btn);color:white;box-shadow:0 4px 14px rgba(59,130,246,0.3)}
+.btn-delete{background:#fee2e2;color:#dc2626;border:1.5px solid #fca5a5}
+body.dark .btn-delete{background:rgba(220,38,38,0.15);color:#f87171;border-color:rgba(248,113,113,0.3)}
+
+/* data table modal */
+.modal-inner{
+  background:white;border-radius:24px;
+  padding:28px 24px;width:100%;max-width:430px;
+  max-height:80vh;overflow-y:auto;
+  animation:sheetUp .3s ease;
+  margin:20px;
+}
+body.dark .modal-inner{background:#1a2535}
+.data-table{width:100%;border-collapse:collapse;font-size:14px;margin-top:10px}
+.data-table th{font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;opacity:0.5;padding:6px 0;text-align:left}
+.data-table td{padding:12px 0;border-bottom:1px solid rgba(0,0,0,0.06);cursor:pointer}
+body.dark .data-table td{border-color:rgba(255,255,255,0.06)}
+.data-table tr:last-child td{border:none}
+.data-table tr:active td{opacity:0.6}
+
+svg{stroke-linecap:round;stroke-linejoin:round}
+</style>
+</head>
+<body>
+
+<!-- Background -->
+<div class="bg"></div>
+
+<!-- SVG Landscape -->
+<svg class="landscape" viewBox="0 0 430 220" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMax slice">
+  <!-- back hills -->
+  <ellipse cx="80" cy="240" rx="220" ry="110" fill="rgba(34,120,70,0.18)"/>
+  <ellipse cx="360" cy="260" rx="200" ry="100" fill="rgba(34,120,70,0.14)"/>
+  <!-- front hills -->
+  <ellipse cx="150" cy="260" rx="260" ry="100" fill="rgba(34,140,80,0.22)"/>
+  <ellipse cx="380" cy="270" rx="180" ry="90" fill="rgba(34,130,70,0.18)"/>
+  <!-- water shimmer -->
+  <rect x="0" y="190" width="430" height="30" fill="rgba(100,180,240,0.12)" rx="4"/>
+  <!-- tiny birds -->
+  <path d="M60 55 q4-4 8 0" stroke="rgba(0,0,0,0.2)" stroke-width="1.5" fill="none"/>
+  <path d="M72 48 q4-4 8 0" stroke="rgba(0,0,0,0.18)" stroke-width="1.4" fill="none"/>
+  <path d="M310 38 q3-3 6 0" stroke="rgba(0,0,0,0.15)" stroke-width="1.3" fill="none"/>
+</svg>
+
+<!-- dark mode landscape overlay -->
+<svg class="landscape" id="darkLandscape" viewBox="0 0 430 220" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMax slice" style="display:none">
+  <ellipse cx="80" cy="240" rx="220" ry="110" fill="rgba(15,30,70,0.6)"/>
+  <ellipse cx="360" cy="260" rx="200" ry="100" fill="rgba(15,25,60,0.55)"/>
+  <ellipse cx="150" cy="260" rx="260" ry="100" fill="rgba(10,20,55,0.7)"/>
+  <ellipse cx="380" cy="270" rx="180" ry="90" fill="rgba(10,18,50,0.6)"/>
+  <!-- stars -->
+  <circle cx="50" cy="30" r="1" fill="rgba(255,255,255,0.6)"/>
+  <circle cx="120" cy="18" r="0.8" fill="rgba(255,255,255,0.5)"/>
+  <circle cx="200" cy="40" r="1.2" fill="rgba(255,255,255,0.55)"/>
+  <circle cx="290" cy="22" r="0.9" fill="rgba(255,255,255,0.5)"/>
+  <circle cx="370" cy="35" r="1" fill="rgba(255,255,255,0.45)"/>
+  <circle cx="160" cy="12" r="0.7" fill="rgba(255,255,255,0.4)"/>
+  <circle cx="340" cy="12" r="0.8" fill="rgba(255,255,255,0.5)"/>
+  <circle cx="410" cy="48" r="0.9" fill="rgba(255,255,255,0.45)"/>
+</svg>
+
+<!-- Clouds -->
+<div class="clouds-layer">
+  <div class="cld a"></div>
+  <div class="cld b"></div>
+  <div class="cld c"></div>
+  <div class="cld d"></div>
+</div>
+
+<!-- ═══ MAIN SCREEN ═══ -->
+<div class="screen" id="mainScreen">
+
+  <div class="top">
+    <button class="iconbtn" id="themeBtn" aria-label="Toggle theme">
+      <svg id="themeIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"></svg>
+    </button>
+    <div class="app-title">Meditation</div>
+    <button class="iconbtn" id="menuBtn" aria-label="Menu">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="5" r="1.2" fill="currentColor" stroke="none"/>
+        <circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/>
+        <circle cx="12" cy="19" r="1.2" fill="currentColor" stroke="none"/>
+      </svg>
+    </button>
+  </div>
+
+  <div class="streak-area">
+    <div class="streak-big" id="streakBig">0 Day Streak</div>
+    <div class="streak-sub" id="streakSub">Begin your journey</div>
+  </div>
+
+  <div class="week-nav">
+    <button class="nav-btn" id="prevBtn">←</button>
+    <div class="week-info">
+      <div class="week-label" id="weekLabel">This Week</div>
+      <div class="week-total" id="weekTotal">0 min</div>
+    </div>
+    <button class="nav-btn" id="nextBtn">→</button>
+  </div>
+
+  <div class="chart-area">
+    <div class="chart" id="chart"></div>
+    <div class="days-grid" id="daysGrid"></div>
+  </div>
+
+  <div class="bottom">
+    <button class="main-btn" id="startBtn">Start Session</button>
+  </div>
+
+</div>
+
+<!-- ═══ TIMER SCREEN ═══ -->
+<div class="screen hidden" id="timerScreen">
+  <div class="timer-label">Meditating</div>
+  <div class="timer-display" id="timerDisplay">0:00</div>
+  <button class="timer-stop" id="stopBtn">Stop Session</button>
+</div>
+
+<!-- ─── Float Menu ─── -->
+<div class="float-menu" id="floatMenu">
+  <button class="menu-item" id="exportBtn">Export CSV</button>
+  <button class="menu-item" id="manageBtn">Manage Data</button>
+</div>
+
+<!-- ─── Session complete / manual add modal ─── -->
+<div class="modal" id="sessionModal">
+  <div class="modal-sheet">
+    <h2 id="sessionModalTitle">Session Complete</h2>
+    <div class="form-group">
+      <label>Date</label>
+      <input type="date" id="sessionDate">
+    </div>
+    <div class="form-group">
+      <label>Minutes</label>
+      <input type="number" id="sessionMins" min="1" placeholder="Minutes">
+    </div>
+    <div class="sheet-btns">
+      <button class="btn-cancel" id="sessionCancel">Cancel</button>
+      <button class="btn-delete" id="sessionDelete" style="display:none">Delete</button>
+      <button class="btn-save" id="sessionSave">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── Data table modal ─── -->
+<div class="modal" id="tableModal" style="align-items:center">
+  <div class="modal-inner">
+    <h2 style="font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:400;margin-bottom:4px">All Sessions</h2>
+    <div id="tableContainer"></div>
+    <div class="sheet-btns" style="margin-top:20px">
+      <button class="btn-cancel" id="tableClose">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── State ──────────────────────────────────────────
+let sessions = JSON.parse(localStorage.getItem('meditationSessions') || '[]');
+let dark = JSON.parse(localStorage.getItem('darkMode') || 'false');
+let weekOffset = 0;
+let editingDate = null;
+let timerInterval = null;
+let timerStart = 0;
+
+// ── Elements ───────────────────────────────────────
+const themeBtn   = document.getElementById('themeBtn');
+const themeIcon  = document.getElementById('themeIcon');
+const menuBtn    = document.getElementById('menuBtn');
+const floatMenu  = document.getElementById('floatMenu');
+const startBtn   = document.getElementById('startBtn');
+const prevBtn    = document.getElementById('prevBtn');
+const nextBtn    = document.getElementById('nextBtn');
+const chartEl    = document.getElementById('chart');
+const daysGrid   = document.getElementById('daysGrid');
+const weekLabel  = document.getElementById('weekLabel');
+const weekTotal  = document.getElementById('weekTotal');
+const streakBig  = document.getElementById('streakBig');
+const streakSub  = document.getElementById('streakSub');
+
+const timerScreen  = document.getElementById('timerScreen');
+const mainScreen   = document.getElementById('mainScreen');
+const timerDisplay = document.getElementById('timerDisplay');
+const stopBtn      = document.getElementById('stopBtn');
+
+const sessionModal = document.getElementById('sessionModal');
+const sessionTitle = document.getElementById('sessionModalTitle');
+const sessionDate  = document.getElementById('sessionDate');
+const sessionMins  = document.getElementById('sessionMins');
+const sessionCancel= document.getElementById('sessionCancel');
+const sessionSave  = document.getElementById('sessionSave');
+const sessionDelete= document.getElementById('sessionDelete');
+
+const tableModal = document.getElementById('tableModal');
+const tableClose = document.getElementById('tableClose');
+
+// ── Helpers ────────────────────────────────────────
+function formatDate(d){ return d.toISOString().split('T')[0] }
+
+function fmtLabel(d){
+  return d.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+}
+
+function getWeekDates(offset=0){
+  const now = new Date();
+  const mon = new Date(now);
+  mon.setDate(now.getDate() - ((now.getDay()+6)%7) + offset*7);
+  return Array.from({length:7},(_,i)=>{
+    const d=new Date(mon); d.setDate(mon.getDate()+i); return d;
+  });
+}
+
+function getWeekLabel(offset){
+  if(offset===0) return 'This Week';
+  if(offset===-1) return 'Last Week';
+  const dates = getWeekDates(offset);
+  return fmtLabel(dates[0]) + ' – ' + fmtLabel(dates[6]);
+}
+
+function calculateStreak(){
+  let s=0, c=new Date(); c.setHours(0,0,0,0);
+  for(let i=0;i<365;i++){
+    const k=formatDate(c);
+    const found=sessions.find(x=>x.date===k && x.minutes>0);
+    if(!found) break;
+    s++; c.setDate(c.getDate()-1);
+  }
+  return s;
+}
+
+function saveData(){
+  localStorage.setItem('meditationSessions', JSON.stringify(sessions));
+  localStorage.setItem('darkMode', JSON.stringify(dark));
+}
+
+// ── Theme ──────────────────────────────────────────
+function applyTheme(){
+  document.body.classList.toggle('dark', dark);
+  document.getElementById('darkLandscape').style.display = dark ? 'block' : 'none';
+  themeIcon.innerHTML = dark
+    ? '<path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z" fill="currentColor" stroke="none"/>'
+    : '<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/>';
+}
+
+themeBtn.addEventListener('click',()=>{ dark=!dark; applyTheme(); saveData(); });
+
+// ── Render ─────────────────────────────────────────
+function render(){
+  applyTheme();
+
+  const weekDates = getWeekDates(weekOffset);
+  const dayNames  = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+
+  const weekData = weekDates.map((date,i)=>{
+    const k = formatDate(date);
+    const s = sessions.find(x=>x.date===k);
+    return { date:k, day:dayNames[i], minutes:s?s.minutes:0 };
+  });
+
+  const total = weekData.reduce((a,b)=>a+b.minutes,0);
+  const max   = Math.max(...weekData.map(d=>d.minutes), 30);
+  const streak= calculateStreak();
+
+  streakBig.textContent = streak + ' Day Streak';
+  streakSub.textContent = streak>0 ? 'Keep going' : 'Begin your journey';
+
+  weekLabel.textContent = getWeekLabel(weekOffset);
+  weekTotal.textContent = total + ' min';
+
+  nextBtn.disabled = (weekOffset === 0);
+
+  // chart
+  chartEl.innerHTML = weekData.map(d=>{
+    const h = max>0 ? Math.round((d.minutes/max)*160) : 0;
+    return `<div class="bar-wrap" data-date="${d.date}">
+      <div class="bar" style="height:${h}px"></div>
+      <div class="bar-label">${d.day}</div>
+    </div>`;
+  }).join('');
+
+  // long-press on chart bar
+  chartEl.querySelectorAll('.bar-wrap').forEach(el=>{
+    let t=null;
+    el.addEventListener('pointerdown',()=>{ t=setTimeout(()=>openEdit(el.dataset.date),600) });
+    el.addEventListener('pointerup',()=>clearTimeout(t));
+    el.addEventListener('pointerleave',()=>clearTimeout(t));
+  });
+
+  // days grid
+  daysGrid.innerHTML = weekData.map(d=>`
+    <div class="day-card" onclick="openEdit('${d.date}')">
+      <div class="day-name">${d.day}</div>
+      <div class="day-mins">${d.minutes>0?d.minutes:'—'}</div>
+      <div class="day-tag">${d.minutes>0?'min':'rest'}</div>
+    </div>`).join('');
+
+  saveData();
+}
+
+// ── Week nav ───────────────────────────────────────
+prevBtn.addEventListener('click',()=>{ weekOffset--; render(); });
+nextBtn.addEventListener('click',()=>{ if(weekOffset<0){ weekOffset++; render(); }});
+
+// ── Edit / Add session modal ───────────────────────
+function openEdit(dateStr){
+  editingDate = dateStr;
+  const s = sessions.find(x=>x.date===dateStr);
+  sessionTitle.textContent = s ? 'Edit Session' : 'Add Session';
+  sessionDate.value  = dateStr;
+  sessionMins.value  = s ? s.minutes : '';
+  sessionDelete.style.display = s ? 'inline-flex' : 'none';
+  sessionModal.classList.add('open');
+  setTimeout(()=>sessionMins.focus(),150);
+}
+
+startBtn.addEventListener('click',()=>{
+  // go to timer screen
+  mainScreen.classList.add('hidden');
+  timerScreen.classList.remove('hidden');
+  timerStart = Date.now();
+  timerDisplay.textContent = '0:00';
+  timerInterval = setInterval(()=>{
+    const elapsed = Date.now() - timerStart;
+    const m = Math.floor(elapsed/60000);
+    const s = Math.floor((elapsed%60000)/1000);
+    timerDisplay.textContent = m + ':' + String(s).padStart(2,'0');
+  }, 500);
+});
+
+stopBtn.addEventListener('click',()=>{
+  clearInterval(timerInterval);
+  timerScreen.classList.add('hidden');
+  mainScreen.classList.remove('hidden');
+
+  const elapsed = Date.now() - timerStart;
+  const minutes = Math.max(1, Math.round(elapsed/60000));
+  const today   = formatDate(new Date());
+
+  sessionTitle.textContent = 'Session Complete';
+  sessionDate.value  = today;
+  sessionMins.value  = minutes;
+  sessionDelete.style.display = 'none';
+  editingDate = today;
+  sessionModal.classList.add('open');
+});
+
+sessionCancel.addEventListener('click',()=>{
+  sessionModal.classList.remove('open');
+  editingDate = null;
+});
+
+sessionSave.addEventListener('click',()=>{
+  const date    = sessionDate.value;
+  const minutes = parseInt(sessionMins.value);
+  if(!date || !minutes || minutes<=0) return;
+  sessions = sessions.filter(s=>s.date!==date);
+  sessions.push({date, minutes});
+  sessions.sort((a,b)=>a.date.localeCompare(b.date));
+  sessionModal.classList.remove('open');
+  editingDate = null;
+  render();
+});
+
+sessionDelete.addEventListener('click',()=>{
+  if(!editingDate) return;
+  sessions = sessions.filter(s=>s.date!==editingDate);
+  sessionModal.classList.remove('open');
+  editingDate = null;
+  render();
+});
+
+sessionMins.addEventListener('keypress',e=>{ if(e.key==='Enter') sessionSave.click(); });
+
+// ── Menu ───────────────────────────────────────────
+menuBtn.addEventListener('click',e=>{ e.stopPropagation(); floatMenu.classList.toggle('open'); });
+document.addEventListener('click',e=>{
+  if(!floatMenu.contains(e.target) && !menuBtn.contains(e.target))
+    floatMenu.classList.remove('open');
+});
+
+// Export CSV – iPhone Safari compatible
+document.getElementById('exportBtn').addEventListener('click',()=>{
+  floatMenu.classList.remove('open');
+  const sorted = [...sessions].sort((a,b)=>a.date.localeCompare(b.date));
+  const today  = formatDate(new Date());
+  const rows   = ['Date,Minutes', ...sorted.map(s=>`${s.date},${s.minutes}`)].join('\r\n');
+
+  // iPhone Safari: use data URI instead of blob URL
+  const uri = 'data:text/csv;charset=utf-8,' + encodeURIComponent(rows);
+  const a   = document.createElement('a');
+  a.href     = uri;
+  a.download = `meditation-data-${today}.csv`;
+  a.style.display = 'none';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+});
+
+document.getElementById('manageBtn').addEventListener('click',()=>{
+  floatMenu.classList.remove('open');
+  const sorted = [...sessions].sort((a,b)=>a.date.localeCompare(b.date));
+  document.getElementById('tableContainer').innerHTML =
+    sorted.length===0
+      ? '<p style="opacity:.5;padding:16px 0;font-size:14px">No sessions yet.</p>'
+      : `<table class="data-table">
+          <tr><th>Date</th><th>Minutes</th></tr>
+          ${sorted.map(s=>`<tr onclick="openEditFromTable('${s.date}')"><td>${s.date}</td><td>${s.minutes}</td></tr>`).join('')}
+        </table>`;
+  tableModal.classList.add('open');
+});
+
+function openEditFromTable(dateStr){
+  tableModal.classList.remove('open');
+  setTimeout(()=>openEdit(dateStr), 200);
+}
+
+tableClose.addEventListener('click',()=>tableModal.classList.remove('open'));
+
+// ── Init ───────────────────────────────────────────
+render();
+</script>
+</body>
+</html>
